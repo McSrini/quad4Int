@@ -13,8 +13,8 @@ import static ca.mcmaster.quad4int.Constants.PURE_BINARY_CONVERTED;
  */
 public class Parameters {
     
-    public final static String MIP_FILENAME =   "F:\\temporary files here\\test.lp";
-    //public final static String MIP_FILENAME =   "nursehint03.pre";
+    //public final static String MIP_FILENAME =   "F:\\temporary files here\\test.lp";
+    public final static String MIP_FILENAME =   "comp21-2idx.pre";
     public final static String DESTINATION_MIP_FILENAME = MIP_FILENAME+ PURE_BINARY_CONVERTED + ".lp" ;    
     public   static Integer MAX_THREADS=  null;
     

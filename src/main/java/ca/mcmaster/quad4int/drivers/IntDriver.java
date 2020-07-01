@@ -29,7 +29,7 @@ import org.apache.log4j.RollingFileAppender;
 public class IntDriver  extends BaseDriver  {
         
     static {
-        org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(IntDriver  .class); 
+        logger = org.apache.log4j.Logger.getLogger(IntDriver  .class); 
         logger.setLevel( LOGGING_LEVEL);
         PatternLayout layout = new PatternLayout("%5p  %d  %F  %L  %m%n");     
         try {
