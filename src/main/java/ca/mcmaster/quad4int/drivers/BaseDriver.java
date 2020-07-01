@@ -7,6 +7,7 @@ package ca.mcmaster.quad4int.drivers;
 
 import static ca.mcmaster.quad4int.Constants.*;
 import static ca.mcmaster.quad4int.Parameters.MAX_THREADS;
+import ca.mcmaster.quad4int.callbacks.EmptyBranchcallback;
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
 import java.net.InetAddress;
@@ -21,8 +22,8 @@ public abstract class BaseDriver {
     
     public static void solve (IloCplex cplex) throws IloException, UnknownHostException {
        cplex.setParam( IloCplex.Param.TimeLimit, SIXTY*SIXTY);
-       //cplex.setParam( IloCplex.Param.Threads, MAX_THREADS);        
-       
+       cplex.setParam( IloCplex.Param.Threads, MAX_THREADS);   
+             
        for (int hour = ZERO; hour < SIXTY ; hour ++) {
            cplex.solve();
            double lpRelax = cplex.getBestObjValue();

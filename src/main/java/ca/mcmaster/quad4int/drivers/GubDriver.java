@@ -5,21 +5,18 @@
  */
 package ca.mcmaster.quad4int.drivers;
 
-import static ca.mcmaster.quad4int.Constants.LOGGING_LEVEL;
-import static ca.mcmaster.quad4int.Constants.LOG_FILE_EXTENSION;
-import static ca.mcmaster.quad4int.Constants.LOG_FOLDER;
-import static ca.mcmaster.quad4int.Constants.ONE;
-import static ca.mcmaster.quad4int.Constants.SIXTY;
-import static ca.mcmaster.quad4int.Parameters.MAX_THREADS;
-import static ca.mcmaster.quad4int.Parameters.MIP_FILENAME;
-import ca.mcmaster.quad4int.callbacks.EmptyBranchcallback;
+import static ca.mcmaster.quad4int.Constants.*;
+import static ca.mcmaster.quad4int.Parameters.*;
+import ca.mcmaster.quad4int.callbacks.GUBBranchCallback;
 import ca.mcmaster.quad4int.converter.QuadConverter;
-import static ca.mcmaster.quad4int.drivers.BaseDriver.logger;
 import ilog.concert.IloException;
+import ilog.concert.IloNumExpr;
+import ilog.concert.IloNumVar;
 import ilog.cplex.IloCplex;
 import static java.lang.System.exit;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 import org.apache.log4j.PatternLayout;
 import org.apache.log4j.RollingFileAppender;
 
@@ -27,14 +24,14 @@ import org.apache.log4j.RollingFileAppender;
  *
  * @author tamvadss
  */
-public class IntDriver  extends BaseDriver  {
-        
+public class GubDriver extends BaseDriver {
+    
     static {
-        logger = org.apache.log4j.Logger.getLogger(IntDriver  .class); 
+        logger = org.apache.log4j.Logger.getLogger(GubDriver  .class); 
         logger.setLevel( LOGGING_LEVEL);
         PatternLayout layout = new PatternLayout("%5p  %d  %F  %L  %m%n");     
         try {
-            RollingFileAppender rfa =new  RollingFileAppender(layout,LOG_FOLDER+  IntDriver.class.getSimpleName()+ LOG_FILE_EXTENSION);
+            RollingFileAppender rfa =new  RollingFileAppender(layout,LOG_FOLDER+  GubDriver.class.getSimpleName()+ LOG_FILE_EXTENSION);
             rfa.setMaxBackupIndex(SIXTY);
             logger.addAppender(rfa);
             logger.setAdditivity(false);
@@ -44,16 +41,20 @@ public class IntDriver  extends BaseDriver  {
             exit(ONE);
         }
     } 
-    
-    public static void main(String[] args) throws IloException, UnknownHostException {
+        
+    public static void main(String[] args) throws  Exception {
                  
         IloCplex cplex = new IloCplex ();
         cplex.importModel(  MIP_FILENAME);  
         
-        logger.info ("IntDriver Starting solve  integer "+ InetAddress.getLocalHost().getHostName() + " threads " +MAX_THREADS ) ;
-        cplex.use (new EmptyBranchcallback()) ;
-        solve(cplex);
-               
+        QuadConverter quad = new QuadConverter();
+        IloCplex convertedCplex = quad.convert( cplex) ;
+       
+        logger.info ("Gub driver Starting solve   "+ InetAddress.getLocalHost().getHostName() + " threads " +MAX_THREADS ) ;
+        convertedCplex.use (new GUBBranchCallback(quad.injectedVariables, quad.convertedCplex   , 
+                                                  quad. identityMap, quad. intToBinMap)) ;
+        solve(convertedCplex);        
+        
     }
     
 }

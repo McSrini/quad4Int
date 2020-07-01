@@ -19,6 +19,7 @@ import static java.lang.System.exit;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -33,6 +34,12 @@ public class QuadConverter {
     private Map<String, Double> objectiveFunction = null;
     private List<Constraint> constraintList = null;
     
+    //for each int var, which binary vars have been injected ?
+    public Map <String,IloNumVar[] > intToBinMap = new HashMap<String, IloNumVar[]>() ;
+    
+    //new binary var, and the corresponding integer var it is part of . Include aux vars
+    public Map <String, String> injectedVariables  = new  TreeMap <String, String>();
+            
     //integer var, and the identity is should be replaced with
     public Map <String, IloNumExpr> identityMap = new HashMap <String, IloNumExpr> ();
         
@@ -70,6 +77,8 @@ public class QuadConverter {
             //
             IloNumVar[] newBinaryVars = convertIntToBinary (  intVar);
             convertedCplex.add(newBinaryVars   );
+            this.recordInjectedBinvars(  newBinaryVars,  intVar  );
+            this.intToBinMap.put( intVar.getName(), newBinaryVars);
             
             //add constraints for these injected binary vars
             addConstraintsOnInjectedBinaryVars (newBinaryVars) ;
@@ -99,6 +108,8 @@ public class QuadConverter {
         }
         auxilliaryVariables=        convertedCplex.boolVarArray (NUM_VARS,    xName) ;   
         this.convertedCplex.add(auxilliaryVariables);
+        
+        this.recordInjectedBinvars(auxilliaryVariables, intVar);
         
         //now create the identity used to replace the int var with binary vars
         idExpr= convertedCplex.sum(idExpr, lowerBound);
@@ -259,6 +270,12 @@ public class QuadConverter {
             convertedCplex.addLe(constraintExprFour, BIG_M ) ;
         }        
          
+    }
+    
+    private void recordInjectedBinvars (IloNumVar[] injectedVar,IloNumVar intVar ) {
+        for (IloNumVar binvar : injectedVar){
+            this.injectedVariables .put(binvar.getName(), intVar.getName()) ;
+        }
     }
     
 }

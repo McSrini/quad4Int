@@ -7,6 +7,7 @@ package ca.mcmaster.quad4int.drivers;
 
 import static ca.mcmaster.quad4int.Constants.*;
 import static ca.mcmaster.quad4int.Parameters.*;
+import ca.mcmaster.quad4int.callbacks.EmptyBranchcallback;
 import ca.mcmaster.quad4int.converter.QuadConverter;
 import ilog.concert.IloException;
 import ilog.cplex.IloCplex;
@@ -47,6 +48,7 @@ public class QuadDriver extends BaseDriver {
         IloCplex convertedCplex = quad.convert( cplex) ;
        
         logger.info ("QuadDriver Starting solve  quadratic "+ InetAddress.getLocalHost().getHostName() + " threads " +MAX_THREADS ) ;
+        convertedCplex.use (new EmptyBranchcallback()) ;
         solve(convertedCplex);        
         
     }
